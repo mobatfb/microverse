@@ -2,6 +2,7 @@
   <div class="startView">
    <center>
     <h3 style="color:white">USER VIEW</h3>
+    <v-btn @click="test()">test</v-btn>
     <v-card style="width: 800px; height: 800px;">
 
 </v-card>
@@ -33,9 +34,11 @@ export default {
     };
   },
   mounted() {
+    this.startEngine()
     if (window.screen.width < 800) {
       this.showMision = true;
     }
+    
     if (this.$route) this.route = this.$route.query.redirect;
   },
   created() {
@@ -44,6 +47,33 @@ export default {
   },
   computed: {},
   methods: {
+    test(){
+      alert(""+ this.$user.id)
+    },
+    startEngine(){
+       setInterval(this.activateUser, 9000);
+    },
+    activateUser(){
+      this.$http
+        .post("/activateuser", {id:this.$user.id})
+        .then((res) => {
+          console.log("res:",res)
+          if (res.data) {
+            if (res.data.activated) {
+              console.log("con internet")
+            } else {
+              console.log("sin internet")
+            }
+          }
+        })
+        .catch((err) => {
+          err = "error";
+          console.log("err",err)
+        })
+        .finally(() => {
+          this.btnDisable = false;
+        });
+    },
     close() {
       this.dialog.active = false;
       this.dialog.news = false;

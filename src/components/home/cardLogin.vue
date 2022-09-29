@@ -2,22 +2,23 @@
   <div style="width: 95%">
        <v-icon class="pa-3" large>mdi-account</v-icon>
         <v-text-field
-          v-model="data.username"
+          v-model="form.email"
           style="width: 50%"
-          label="Usuario"
-          placeholder="usuario"
+          label="Correo"
+          placeholder="correo"
           outlined
         ></v-text-field>
         <v-text-field
-          v-model="data.password"
+          v-model="form.password"
           style="width: 50%"
           label="Contraseña"
           placeholder="contraseña"
           outlined
           type="password"
         ></v-text-field>
+        <span>{{sms}}</span>
         <br />
-        <v-btn class="ma-3" color="blue" text @click="login(data)"><h2>ACCEDER</h2></v-btn>
+        <v-btn class="ma-3" color="blue" text @click="loginUser(form)"><h2>ACCEDER</h2></v-btn>
         <br />
     <br />
   </div>
@@ -31,25 +32,36 @@ export default {
   },
   data() {
     return {
-      data:{},
-      users: [
-        {
-          username: "juan",
-          password: "12345",
-          active: false,
-        },
-        {
-          username: "pedro",
-          password: "12345",
-          active: false,
-        },
-      ],
+      form:{},
+      sms:"",
       selected: {},
     };
   },
   methods: {
     btnPlay(txt) {
       this.$emit("search", txt);
+    },
+        async loginUser() {
+      this.sms=""
+      this.$http
+        .post("/loginuser", this.form)
+        .then((res) => {
+          if (res.data && res.data.userId) {
+            this.$user.id=res.data.userId
+            this.form.password = "";
+            this.$router.push({ path: '/user' })
+          } else {
+      this.sms=res.data.message
+//            this.$function["alertIni"](res.data.status, res.data.message);
+          }
+        })
+        .catch((err) => {
+          err = "";
+          this.$function["alertIni"]("error", "Ha ocurrido un error" + err);
+        })
+        .finally(() => {
+          this.btnDisable = false;
+        });
     },
     login() {
       if (this.data.username == this.users[0].username) {

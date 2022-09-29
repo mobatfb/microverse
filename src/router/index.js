@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import VueMeta from 'vue-meta'
 Vue.prototype.$appInfo = { name: "MOBA", slogan: "Technology for Business", description: "Nada..", version: "1.0.0", autor: "MOBA - TECHNOLOGY FOR BUSINESS", keywords: ["services", "world", "manager", "moba", "business"] }
 Vue.prototype.$func = { openDialog: null, name: null }
-Vue.prototype.$user = { data: {}, name: null }
+Vue.prototype.$user = {id:null}
 Vue.prototype.$salesman = { name: 'Don Code', contact: '986929110' }
 Vue.prototype.$color = {
   primary: '#FFC607',
