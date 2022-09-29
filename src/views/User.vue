@@ -2,9 +2,16 @@
   <div class="startView">
    <center>
     <h3 style="color:white">USER VIEW</h3>
-    <v-btn @click="test()">test</v-btn>
     <v-card style="width: 800px; height: 800px;">
-
+      <h3>x={{pos.x}} y={{pos.y}}</h3>
+<v-btn  dark 
+:style="{
+            width: '50px',
+            height: '50px',
+            position: 'absolute',
+            left:pos.x+'px',
+            bottom:pos.y+'px'
+          }"></v-btn>
 </v-card>
    </center>
     <br />
@@ -18,6 +25,7 @@ export default {
   data() {
     return {
       showMision: false,
+      pos:{x:0,y:0,z:0},
       infoCard: {
         active: false,
         title: "",
@@ -34,6 +42,7 @@ export default {
     };
   },
   mounted() {
+    
     this.startEngine()
     if (window.screen.width < 800) {
       this.showMision = true;
@@ -42,6 +51,9 @@ export default {
     if (this.$route) this.route = this.$route.query.redirect;
   },
   created() {
+    document.addEventListener('keydown', (event)=>{
+      this.keypress(event.key.toLowerCase())
+} );
     this.$func.openDialog = this.openDialog;
     this.openDialog("news", { name: "dfdf" });
   },
@@ -54,6 +66,46 @@ export default {
        setInterval(this.activateUser, 9000);
     },
     activateUser(){
+      this.$http
+        .post("/activateuser", {id:this.$user.id})
+        .then((res) => {
+          console.log("res:",res)
+          if (res.data) {
+            if (res.data.activated) {
+              console.log("con internet")
+            } else {
+              console.log("sin internet")
+            }
+          }
+        })
+        .catch((err) => {
+          err = "error";
+          console.log("err",err)
+        })
+        .finally(() => {
+          this.btnDisable = false;
+        });
+    },
+    keypress(key){
+console.log("key:",key)
+      switch (key) {
+  case "a":
+    this.pos.x-=10
+    break;
+    case "d":
+    this.pos.x+=10
+    break;
+    case "w":
+    this.pos.y+=10
+    break;
+    case "s":
+    this.pos.y-=10
+    break;
+  default:
+    break;
+}
+    },
+        refreshUser(){
       this.$http
         .post("/activateuser", {id:this.$user.id})
         .then((res) => {
