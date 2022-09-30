@@ -20,7 +20,9 @@
   <h3 style="color:white">LIST DESCONECT</h3>
 
   <v-card style="width: 800px; height: 800px;">
-
+<v-btn v-for="user in listUsersActive" :key="user.id" >
+{{user.name}}
+</v-btn>
 </v-card>
 </v-col>
     </v-row>
@@ -36,6 +38,8 @@ export default {
   name: "master",
   data() {
     return {
+      listUsersActive:[],
+      passMaster:"sawqewsdX21@#%s",
       showMision: false,
       infoCard: {
         active: false,
@@ -49,84 +53,11 @@ export default {
       searchText: "",
       imgMoba: require("@/assets/img/business/moba.png"),
       selected: {},
-      items: [
-{
-          img: require("@/assets/img/services/stock.jpg"),
-          title: "Venta de productos",
-          avalible: "Ecuador",
-          by: "moba",
-          info: "Conoce nuestro stock a buenos precios y al por mayor.",
-          ubication: "Ecuador-El Oro-Machala",
-          path: "Productos",
-        },
-        {
-          img: require("@/assets/img/services/adminSystem.jpg"),
-          title: "Sistemas Administrativos",
-          avalible: "Disponible",
-          by: "moba",
-          info: "Brindamos capacitación tecnología en  el uso de herramientas de gestión y administración.",
-          ubication: "Ecuador-El Oro-Machala",
-          path: "Sistemas",
-        },
-        {
-          img: require("@/assets/img/services/educacion.jpg"),
-          title: "Plataformas y sitios web",
-          avalible: "Disponible",
-          by: "moba",
-          info: "Brindamos servicios de desarrollo para que tengas tu propia página web administrativa y publicista.",
-          ubication: "Ecuador-El Oro-Machala",
-          path: "Plataformas",
-        },
-        {
-          img: require("@/assets/img/services/hogar.jpg"),
-          title: "Aplicaciones móviles",
-          avalible: "Disponible",
-          by: "moba",
-          info: "Desarrollamos aplicaciones móviles a la medida de tu necesidad.",
-          ubication: "Ecuador-Azuay-Cuenca",
-          path: "Aplicaciones",
-        },
-        {
-          img: require("@/assets/img/services/transporte.jpg"),
-          title: "Capacitación Tecnológica",
-          avalible: "Disponible",
-          by: "moba",
-          info: "Brindamos capacitación tecnológica en  el uso de herramientas de gestión y administración.",
-          ubication: "Ecuador-Loja-Loja",
-          path: "Capacitacion",
-        },
-        {
-          img: require("@/assets/img/services/educacion.jpg"),
-          title: "Marketing publicitario",
-          avalible: "Disponible",
-          by: "moba",
-          info: "Con la publicidad tu negocio podrá tener un mayor alcance de clientela y maximizar tus ventas.",
-          ubication: "Ecuador-Loja-Loja",
-          path: "Marketing",
-        },
-        {
-          img: require("@/assets/img/services/produccion.jpg"),
-          title: "Equipos informáticos",
-          avalible: "Disponible",
-          by: "moba",
-          info: "Cotizamos equipos informáticos con la garantía de brindarte el equipo adecuado para tu negocio.",
-          ubication: "Ecuador-Loja-Loja",
-          path: "Equipos",
-        },
-        {
-          img: require("@/assets/img/services/tecnologia.jpg"),
-          title: "Mantenimiento y soporte técnico.",
-          avalible: "Disponible",
-          by: "moba",
-          info: "Realizamos servicios de mantenimiento y reparación de diversos tipos de equipos y componentes tecnológicos.",
-          ubication: "Ecuador-Loja-Loja",
-          path: "Mantenimiento",
-        },
 
-      ],
     };
   },
   mounted() {
+    this.getListUsersActive()
     if (window.screen.width < 800) {
       this.showMision = true;
     }
@@ -138,6 +69,30 @@ export default {
   },
   computed: {},
   methods: {
+    getListUsersActive(){
+      this.$http
+        .post("/getusersactive",{pass:this.passMaster})
+        .then((res) => {
+          if (res.data) {
+            if (res.data.users) {
+              this.listUsersActive=res.data.users
+              console.log("users:", this.listUsersActive);
+
+              //this.saveSignal()
+              //this.getSignal()
+            } else {
+              console.log("sin internet");
+            }
+          }
+        })
+        .catch((err) => {
+          err = "error";
+          console.log("err", err);
+        })
+        .finally(() => {
+          this.btnDisable = false;
+        });
+    },
     close() {
       this.dialog.active = false;
       this.dialog.news = false;

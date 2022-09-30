@@ -1,31 +1,39 @@
 <template>
   <div class="startView">
-   <center>
-    <h3 style="color:white">USER VIEW</h3>
-    <v-card style="width: 800px; height: 800px;">
-      <h3>x={{pos.x}} y={{pos.y}}</h3>
-<v-btn  dark 
-:style="{
+    <center>
+      <h3 style="color: white">USER VIEW</h3>
+      <v-card style="width: 800px; height: 800px">
+        <h3>{{ user.name }} => (x={{ user.pos.x }}, y={{ user.pos.y }})</h3>
+        <h3>basedata => (x={{ posShow.x }}, y={{ posShow.y }})</h3>
+        <v-btn
+          dark
+          :style="{
             width: '50px',
             height: '50px',
             position: 'absolute',
-            left:pos.x+'px',
-            bottom:pos.y+'px'
-          }"></v-btn>
-</v-card>
-   </center>
+            left: user.pos.x + 'px',
+            bottom: user.pos.y + 'px',
+          }"
+        ></v-btn>
+      </v-card>
+    </center>
     <br />
   </div>
 </template>
 <script>
 export default {
-  components: {
-  },
+  components: {},
   name: "user",
   data() {
     return {
       showMision: false,
-      pos:{x:0,y:0,z:0},
+     user:{
+      name:"",
+      username:"",
+      pos: { x: 0, y: 0, z: 0 },
+      view:""
+     },
+     posShow: { x: 0, y: 0, z: 0 },
       infoCard: {
         active: false,
         title: "",
@@ -34,97 +42,119 @@ export default {
         business: false,
         login: false,
       },
-      dialog:{},
+      dialog: {},
       searchText: "",
       imgMoba: require("@/assets/img/business/moba.png"),
       selected: {},
-    
     };
   },
   mounted() {
-    
-    this.startEngine()
+    this.startEngine();
     if (window.screen.width < 800) {
       this.showMision = true;
     }
-    
+
     if (this.$route) this.route = this.$route.query.redirect;
   },
   created() {
-    document.addEventListener('keydown', (event)=>{
-      this.keypress(event.key.toLowerCase())
-} );
+    document.addEventListener("keydown", (event) => {
+      this.keypress(event.key.toLowerCase());
+    });
     this.$func.openDialog = this.openDialog;
     this.openDialog("news", { name: "dfdf" });
   },
   computed: {},
   methods: {
-    test(){
-      alert(""+ this.$user.id)
+    test() {
+      alert("" + this.$user.id);
     },
-    startEngine(){
-       setInterval(this.activateUser, 9000);
+    startEngine() {
+      this.getUser();
     },
-    activateUser(){
+    getUser(){
       this.$http
-        .post("/activateuser", {id:this.$user.id})
+        .post("/getuser", {id:this.$user.id})
         .then((res) => {
-          console.log("res:",res)
           if (res.data) {
-            if (res.data.activated) {
-              console.log("con internet")
+            if (res.data.getted) {
+              this.user=res.data.getted
+              this.saveSignal()
+              this.getSignal()
             } else {
-              console.log("sin internet")
+              console.log("sin internet");
             }
           }
         })
         .catch((err) => {
           err = "error";
-          console.log("err",err)
+          console.log("err", err);
         })
         .finally(() => {
           this.btnDisable = false;
         });
     },
-    keypress(key){
-console.log("key:",key)
+    saveSignal() {
+      var dataSave={id: this.$user.id,pos:this.user.pos }
+      this.$http
+        .post("/savesignal", dataSave)
+        .then((res) => {
+          if (res.data) {
+            if (res.data.saved) {
+              console.log("saved");
+              this.saveSignal()
+            } else {
+              console.log("nosaved");
+            }
+          }
+        })
+        .catch((err) => {
+          err = "error";
+          console.log("err", err);
+        })
+        .finally(() => {
+          this.btnDisable = false;
+        });
+    },
+    getSignal() {
+      this.$http
+        .post("/getsignal", {id:this.$user.id})
+        .then((res) => {
+          if (res.data) {
+            if (res.data.getted) {
+              this.posShow=res.data.getted.pos
+              console.log("get");
+              this.getSignal()
+            } else {
+              console.log("noget");
+            }
+          }
+        })
+        .catch((err) => {
+          err = "error";
+          console.log("err", err);
+        })
+        .finally(() => {
+          this.btnDisable = false;
+        });
+    },
+    keypress(key) {
+      console.log("key:", key);
       switch (key) {
-  case "a":
-    this.pos.x-=10
-    break;
-    case "d":
-    this.pos.x+=10
-    break;
-    case "w":
-    this.pos.y+=10
-    break;
-    case "s":
-    this.pos.y-=10
-    break;
-  default:
-    break;
-}
-    },
-        refreshUser(){
-      this.$http
-        .post("/activateuser", {id:this.$user.id})
-        .then((res) => {
-          console.log("res:",res)
-          if (res.data) {
-            if (res.data.activated) {
-              console.log("con internet")
-            } else {
-              console.log("sin internet")
-            }
-          }
-        })
-        .catch((err) => {
-          err = "error";
-          console.log("err",err)
-        })
-        .finally(() => {
-          this.btnDisable = false;
-        });
+        case "a":
+          this.user.pos.x -= 10;
+          break;
+        case "d":
+          this.user.pos.x += 10;
+          break;
+        case "w":
+          this.user.pos.y += 10;
+          break;
+        case "s":
+          this.user.pos.y -= 10;
+          break;
+        default:
+          break;
+      }
     },
     close() {
       this.dialog.active = false;

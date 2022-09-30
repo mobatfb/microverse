@@ -39,6 +39,7 @@ export default {
   name: "home",
   data() {
     return {
+      cont:0,
       showMision: false,
       login:true,
       infoCard: {
@@ -63,11 +64,32 @@ export default {
     if (this.$route) this.route = this.$route.query.redirect;
   },
   created() {
+   // this.ini()
     this.$func.openDialog = this.openDialog;
     this.openDialog("news", { name: "dfdf" });
   },
   computed: {},
   methods: {
+    ini(){
+      this.cont++
+      this.$http
+        .post("/activateuser", {id:'6334f03454a1dc2254d37a7a'})
+        .then((res) => {
+          if (res.data) {
+            if (res.data.activated) {
+              console.log("repeat:",this.cont)
+              this.ini()
+            } 
+          }
+        })
+        .catch((err) => {
+          err = "error";
+          console.log("err",err)
+        })
+        .finally(() => {
+          this.btnDisable = false;
+        });
+    },
     close() {
       this.dialog.active = false;
       this.dialog.news = false;
